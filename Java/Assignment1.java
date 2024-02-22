@@ -3,37 +3,40 @@ package com.edu.MavTest;
 import java.util.Random;
 
 class Account {
-    String accountId;
-    String accountName;
-    double balance;
-    Loan loan; // Added loan object
+    private String accountId;
+    private String accountName;
+    private double balance;
+    private Loan loan;
 
-    public void initialize(String accountId, String accountName, double initialBalance, Loan loan) {
+    public Account(String accountId, String accountName, double initialBalance, Loan loan) {
         this.accountId = accountId;
         this.accountName = accountName;
         this.balance = initialBalance;
-        this.loan = loan; // Set the loan object
+        this.loan = loan;
     }
 
-    public void getDetails() {
-        System.out.println("Account ID: " + accountId + ", Account Name: " + accountName + ", Balance: $" + String.format("%.2f", balance));
+    public double getBalance() {
+        return balance;
+    }
+
+    public void displayDetails() {
+        System.out.printf("Account ID: %s, Account Name: %s, Balance: $%.2f%n", accountId, accountName, balance);
         if (loan != null) {
-            loan.getLoan(); // Show loan details if loan exists
+            loan.displayLoan();
         }
     }
 
-    public void depositAmount(double amt) {
-        balance += amt;
-        System.out.println("Deposited: $" + String.format("%.2f", amt));
-        System.out.println("Current Balance: $" + String.format("%.2f", balance));
+    public void deposit(double amount) {
+        balance += amount;
+        System.out.printf("Deposited: $%.2f%n", amount);
+        System.out.printf("Current Balance: $%.2f%n", balance);
     }
 
-    public void withdrawAmount(double amt) {
-        // Ensure withdrawal amount doesn't exceed balance
-        if (amt > 0 && amt <= balance) {
-            balance -= amt;
-            System.out.println("Withdrawn: $" + String.format("%.2f", amt));
-            System.out.println("Current Balance: $" + String.format("%.2f", balance));
+    public void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            System.out.printf("Withdrawn: $%.2f%n", amount);
+            System.out.printf("Current Balance: $%.2f%n", balance);
         } else {
             System.out.println("Insufficient balance or invalid withdrawal amount.");
         }
@@ -41,72 +44,59 @@ class Account {
 }
 
 class Loan {
-    String loanId;
-    String loanType;
-    double loanAmount;
+    private String loanId;
+    private String loanType;
+    private double loanAmount;
 
-    public void initialize(String loanId, String loanType, double loanAmount) {
+    public Loan(String loanId, String loanType, double loanAmount) {
         this.loanId = loanId;
         this.loanType = loanType;
         this.loanAmount = loanAmount;
     }
 
-    public void getLoan() {
-        System.out.println("Loan ID: " + loanId + ", Loan Type: " + loanType + ", Loan Amount: $" + String.format("%.2f", loanAmount));
+    public void displayLoan() {
+        System.out.printf("Loan ID: %s, Loan Type: %s, Loan Amount: $%.2f%n", loanId, loanType, loanAmount);
     }
 }
 
 public class Assignment1 {
 
     public static void main(String[] args) {
-        // Create an array of 10 accounts
+        Random random = new Random();
         Account[] accounts = new Account[10];
 
-        // Generate random accounts and loans
-        Random random = new Random();
         for (int i = 0; i < 10; i++) {
             String accountId = generateAccountId(random);
             String accountName = "Account " + i;
-            double initialBalance = random.nextDouble() * 1000; // Initial balance up to $1000
+            double initialBalance = random.nextDouble() * 1000;
             String loanType = random.nextBoolean() ? "home" : "car";
-            double loanAmount = random.nextDouble() * 100000; // Random loan amount up to $100,000
+            double loanAmount = random.nextDouble() * 100000;
 
-            // Create loan object with random details
-            Loan loan = new Loan();
-            loan.initialize(generateAccountId(random), loanType, loanAmount);
-
-            // Create account object and initialize with generated details
-            Account account = new Account();
-            account.initialize(accountId, accountName, initialBalance, loan);
-
-            // Add account to the array
+            Loan loan = new Loan(generateAccountId(random), loanType, loanAmount);
+            Account account = new Account(accountId, accountName, initialBalance, loan);
             accounts[i] = account;
 
-            // Show account details
-            account.getDetails();
+            account.displayDetails();
 
-            // Deposit a random amount
-            double depositAmt = random.nextDouble() * 1000;
-            account.depositAmount(depositAmt);
+            double depositAmount = random.nextDouble() * 1000;
+            account.deposit(depositAmount);
 
-            // Withdraw a random amount (up to current balance)
-            double withdrawalAmt = random.nextDouble() * account.balance;
-            account.withdrawAmount(withdrawalAmt);
+            double withdrawalAmount = random.nextDouble() * account.getBalance();
+            account.withdraw(withdrawalAmount);
 
-            // Show account details after transactions
-            System.out.println(); // Adding a new line for readability
+            System.out.println();
         }
     }
 
     public static String generateAccountId(Random random) {
+        StringBuilder accountIdBuilder = new StringBuilder();
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String accId = "";
         for (int i = 0; i < 7; i++) {
-            accId += random.nextInt(10);
+            accountIdBuilder.append(random.nextInt(10));
         }
         for (int i = 0; i < 4; i++) {
-            accId += chars.charAt(random.nextInt(chars.length()));
+            accountIdBuilder.append(chars.charAt(random.nextInt(chars.length())));
         }
-        return accId;
+        return accountIdBuilder.toString();
     }
 }
